@@ -115,13 +115,27 @@ const styles = StyleSheet.create({
   dataContainer: {
     marginTop: 20,
     padding: 10,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#9fd18a',
     borderRadius: 8,
   },
   dataText: {
     fontSize: 18,
     marginVertical: 5,
-  }
+  },
+
+  button: {
+    width: '100%',
+    backgroundColor: '#3498db',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+    shadowColor: '#23a6d5',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.18,
+    shadowRadius: 8,
+    elevation: 4,
+  },
 });
 
 export default App;
