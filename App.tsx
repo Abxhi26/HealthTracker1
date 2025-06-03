@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -12,18 +12,42 @@ import {
   readRecords
 } from 'react-native-health-connect';
 
+import { setupBackgroundSync } from './src/services/BackgroundHealthSync';
+
 type HealthData = {
   steps: number;
   height: number;
+  weight: number;
   sleepDuration: number;
+  distance:number;
+  heartRate:number;
+  calories:number;
+
 };
+
+
 
 const App: React.FC = () => {
   const [healthData, setHealthData] = useState<HealthData>({
     steps: 0,
     height: 0,
-    sleepDuration: 0
+    weight: 0,
+    sleepDuration: 0,
+    distance: 0,
+    heartRate: 0,
+    calories: 0,
+
+
   });
+
+
+//background sync
+  //useEffect(() => {
+   // setupBackgroundSync();
+  //}, []);
+
+
+
   const [loading, setLoading] = useState<boolean>(false);
 
   const fetchHealthData = async () => {
@@ -37,7 +61,11 @@ const App: React.FC = () => {
       await requestPermission([
         { accessType: 'read', recordType: 'Steps' },
         { accessType: 'read', recordType: 'Height' },
-        { accessType: 'read', recordType: 'SleepSession' }
+        { accessType: 'read', recordType: 'SleepSession' },
+        { accessType: 'read', recordType: 'Distance' },
+        { accessType: 'read', recordType: 'HeartRate' },
+        { accessType: 'read', recordType: 'Weight' },
+        { accessType: 'read', recordType: 'TotalCaloriesBurned' },
       ]);
 
   
@@ -50,16 +78,38 @@ const App: React.FC = () => {
         endTime: endOfDay
       };
 
-      // Fetch steps
+      const weightResult = await readRecords('Weight', { timeRangeFilter });
+      const latestWeight = weightResult.records && weightResult.records.length > 0
+        ? weightResult.records[weightResult.records.length - 1].weight.inKilograms
+        : 0;
+
+      
       const stepsResult = await readRecords('Steps', { timeRangeFilter });
       const totalSteps = stepsResult.records
         ? stepsResult.records.reduce((sum: number, record: any) => sum + (record.count || 0), 0)
         : 0;
 
+      const distanceResult = await readRecords('Distance', { timeRangeFilter });
+      const totalDistance = distanceResult.records
+        ? distanceResult.records.reduce((sum: number, record: any) => sum + (record.distance?.meters || 0), 0)
+        : 0;
+
+      const heartRateResult = await readRecords('HeartRate', { timeRangeFilter });
+      const avgHeartRate =
+        heartRateResult.records && heartRateResult.records.length > 0
+          ? heartRateResult.records.reduce((sum: number, record: any) => sum + (record.samples?.[0]?.beatsPerMinute || 0), 0) /
+          heartRateResult.records.length
+            : 0;
+
       
       const heightResult = await readRecords('Height', { timeRangeFilter });
       const latestHeight = heightResult.records && heightResult.records.length > 0
         ? heightResult.records[heightResult.records.length - 1].height.inMeters
+        : 0;
+
+      const caloriesResult = await readRecords('TotalCaloriesBurned', { timeRangeFilter });
+      const totalCalories = caloriesResult.records
+        ? caloriesResult.records.reduce((sum: number, record: any) => sum + (record.energy?.kilocalories || 0), 0)
         : 0;
 
       
@@ -75,7 +125,11 @@ const App: React.FC = () => {
       setHealthData({
         steps: totalSteps,
         height: latestHeight,
-        sleepDuration: totalSleep / (1000 * 60 * 60) 
+        sleepDuration: totalSleep / (1000 * 60 * 60),
+        distance: totalDistance / 1000, 
+        heartRate: avgHeartRate,
+        weight: latestWeight,
+        calories:totalCalories,
       });
     } catch (error) {
       console.error('Error fetching health data:', error);
@@ -99,7 +153,19 @@ const App: React.FC = () => {
           Height: {(healthData.height * 100).toFixed(1)} cm
         </Text>
         <Text style={styles.dataText}>
+          Weight: {healthData.weight.toFixed(1)} kg
+        </Text>
+        <Text style={styles.dataText}>
           Sleep: {healthData.sleepDuration.toFixed(1)} hours
+        </Text>
+        <Text style={styles.dataText}>
+          HeartRate: {healthData.heartRate.toFixed(1)} beatsPerMinute
+        </Text>
+        <Text style={styles.dataText}>
+          Distance: {healthData.distance.toFixed(1)} km
+        </Text>
+        <Text style={styles.dataText}>
+          Calories: {healthData.calories.toFixed(1)} KCal
         </Text>
       </View>
     </SafeAreaView>
