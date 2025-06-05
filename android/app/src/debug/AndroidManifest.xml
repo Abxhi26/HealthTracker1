@@ -9,7 +9,17 @@
     <uses-permission android:name="android.permission.health.WRITE_STEPS" />
     <uses-permission android:name="android.permission.health.READ_SLEEP" />
     <uses-permission android:name="android.permission.health.WRITE_SLEEP" />
+    <uses-permission android:name="android.permission.health.READ_HEART_RATE" />
+    <uses-permission android:name="android.permission.health.WRITE_HEART_RATE"/>
+    <uses-permission android:name="android.permission.health.READ_DISTANCE" />
+    <uses-permission android:name="android.permission.health.WRITE_DISTANCE"/>
+    <uses-permission android:name="android.permission.health.READ_WEIGHT" />
+    <uses-permission android:name="android.permission.health.READ_TOTAL_CALORIES_BURNED"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     
+    
+
 
     <application
         android:usesCleartextTraffic="true"
@@ -46,8 +56,7 @@
        </intent-filter>
      </activity>
 
-    <!-- For versions starting Android 14, create an activity alias to show the rationale
-         of Health Connect permissions once users click the privacy policy link. -->
+    
      <activity-alias
        android:name="ViewPermissionUsageActivity"
        android:exported="true"
@@ -58,5 +67,11 @@
          <category android:name="android.intent.category.HEALTH_PERMISSIONS" />
        </intent-filter>
      </activity-alias>
+      <!-- Background Fetch Function -->
+     <service  
+      android:name="com.transistorsoft.rnbackgroundfetch.HeadlessTask" 
+      android:enabled="true" 
+      android:exported="true" />
+
      </application>
 </manifest>

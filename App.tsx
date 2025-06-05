@@ -12,7 +12,7 @@ import {
   readRecords
 } from 'react-native-health-connect';
 
-import { setupBackgroundSync } from './src/services/BackgroundHealthSync';
+ import { setupBackgroundSync } from './src/services/BackgroundHealthSync';
 
 type HealthData = {
   steps: number;
@@ -42,9 +42,9 @@ const App: React.FC = () => {
 
 
 //background sync
-  //useEffect(() => {
-   // setupBackgroundSync();
-  //}, []);
+  useEffect(() => {
+    setupBackgroundSync();
+  }, []);
 
 
 
